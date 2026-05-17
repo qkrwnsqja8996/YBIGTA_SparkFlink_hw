@@ -31,33 +31,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up QEMU (ARM64 emulation)
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Flink base image
+      - name: Build and push Flink base image (amd64 + arm64)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: docker/Dockerfile.flink.base
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ghcr.io/${{ env.OWNER }}/ybigta_spfl_hw-flink:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Make Flink package public
-        run: |
-          gh api \
-            --method PATCH \
-            -H "Accept: application/vnd.github+json" \
-            /user/packages/container/ybigta_spfl_hw-flink/versions \
-            || true
-          gh api \
-            --method PATCH \
-            -H "Accept: application/vnd.github+json" \
-            "/orgs/${{ env.OWNER }}/packages/container/ybigta_spfl_hw-flink" \
-            -f visibility=public || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-spark:
     runs-on: ubuntu-latest
@@ -75,25 +64,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up QEMU (ARM64 emulation)
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Spark base image
+      - name: Build and push Spark base image (amd64 + arm64)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: docker/Dockerfile.spark.base
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ghcr.io/${{ env.OWNER }}/ybigta_spfl_hw-spark:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Make Spark package public
-        run: |
-          gh api \
-            --method PATCH \
-            -H "Accept: application/vnd.github+json" \
-            "/user/packages/container/ybigta_spfl_hw-spark" \
-            -f visibility=public || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
