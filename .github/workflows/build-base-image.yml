@@ -1,0 +1,99 @@
+name: Build & Push Base Images to GHCR
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docker/Dockerfile.flink.base"
+      - "docker/Dockerfile.spark.base"
+      - "docker/spark-entrypoint.sh"
+      - ".github/workflows/build-base-image.yml"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: ${{ github.repository_owner }}
+
+jobs:
+  build-flink:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Flink base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.flink.base
+          push: true
+          tags: ghcr.io/${{ env.OWNER }}/ybigta_spfl_hw-flink:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Make Flink package public
+        run: |
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            /user/packages/container/ybigta_spfl_hw-flink/versions \
+            || true
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            "/orgs/${{ env.OWNER }}/packages/container/ybigta_spfl_hw-flink" \
+            -f visibility=public || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-spark:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Spark base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.spark.base
+          push: true
+          tags: ghcr.io/${{ env.OWNER }}/ybigta_spfl_hw-spark:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Make Spark package public
+        run: |
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            "/user/packages/container/ybigta_spfl_hw-spark" \
+            -f visibility=public || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
