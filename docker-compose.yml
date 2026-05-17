@@ -1,0 +1,212 @@
+version: "3.8"
+
+networks:
+  spfl-ha:
+    driver: bridge
+
+volumes:
+  pipeline-data:
+
+x-flink-common: &flink-common
+  build:
+    context: .
+    dockerfile: docker/Dockerfile.flink
+  networks:
+    - spfl-ha
+  volumes:
+    - pipeline-data:/data
+  environment:
+    - FLINK_PROPERTIES=jobmanager.rpc.address=flink-jm
+
+x-spark-common: &spark-common
+  build:
+    context: .
+    dockerfile: docker/Dockerfile.spark
+  networks:
+    - spfl-ha
+  volumes:
+    - pipeline-data:/data
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    hostname: zookeeper
+    container_name: zookeeper
+    networks:
+      - spfl-ha
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    hostname: kafka
+    container_name: kafka
+    networks:
+      - spfl-ha
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_INTERNAL://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:29092", "--list"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  flink-jm:
+    <<: *flink-common
+    hostname: flink-jm
+    container_name: flink-jm
+    command: jobmanager
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./jobs:/jobs:ro
+    environment:
+      - FLINK_PROPERTIES=jobmanager.rpc.address=flink-jm
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/overview"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  flink-tm1:
+    <<: *flink-common
+    hostname: flink-tm1
+    container_name: flink-tm1
+    command: taskmanager
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./jobs:/jobs:ro
+    depends_on:
+      flink-jm:
+        condition: service_healthy
+
+  flink-tm2:
+    <<: *flink-common
+    hostname: flink-tm2
+    container_name: flink-tm2
+    command: taskmanager
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./jobs:/jobs:ro
+    depends_on:
+      flink-jm:
+        condition: service_healthy
+
+  flink-tm3:
+    <<: *flink-common
+    hostname: flink-tm3
+    container_name: flink-tm3
+    command: taskmanager
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./jobs:/jobs:ro
+    depends_on:
+      flink-jm:
+        condition: service_healthy
+
+  spark-master:
+    <<: *spark-common
+    hostname: spark-master
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf:ro
+      - ./jobs:/jobs:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  spark-worker1:
+    <<: *spark-common
+    hostname: spark-worker1
+    container_name: spark-worker1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf:ro
+      - ./jobs:/jobs:ro
+    depends_on:
+      spark-master:
+        condition: service_healthy
+
+  spark-worker2:
+    <<: *spark-common
+    hostname: spark-worker2
+    container_name: spark-worker2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf:ro
+      - ./jobs:/jobs:ro
+    depends_on:
+      spark-master:
+        condition: service_healthy
+
+  spark-worker3:
+    <<: *spark-common
+    hostname: spark-worker3
+    container_name: spark-worker3
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - pipeline-data:/data
+      - ./student/conf/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf:ro
+      - ./jobs:/jobs:ro
+    depends_on:
+      spark-master:
+        condition: service_healthy

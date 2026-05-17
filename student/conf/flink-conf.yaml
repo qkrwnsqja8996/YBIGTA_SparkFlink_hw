@@ -1,0 +1,35 @@
+# =============================================================================
+# Flink Cluster Configuration
+# YBIGTA Spark & Flink Homework
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# FIXED SETTINGS - DO NOT MODIFY
+# -----------------------------------------------------------------------------
+jobmanager.rpc.address: flink-jm
+jobmanager.rpc.port: 6123
+jobmanager.memory.process.size: 1600m
+taskmanager.memory.process.size: 1728m
+rest.port: 8081
+rest.address: 0.0.0.0
+
+# -----------------------------------------------------------------------------
+# TODO: Checkpointing
+# Flink는 주기적으로 처리 상태(State)의 스냅샷을 저장합니다.
+# 아래 항목을 설정하지 않으면 Flink 잡이 시작되지 않습니다.
+# student/README.md 참고
+# -----------------------------------------------------------------------------
+
+execution.checkpointing.interval: 5000
+execution.checkpointing.mode: EXACTLY_ONCE
+state.checkpoints.dir: file:///data/checkpoints
+state.backend: hashmap
+
+# -----------------------------------------------------------------------------
+# TODO: 병렬성 설정
+# taskmanager 3대 × numberOfTaskSlots 슬롯 = 총 처리 슬롯 수
+# student/README.md 참고
+# -----------------------------------------------------------------------------
+
+taskmanager.numberOfTaskSlots: 2
+parallelism.default: 2
