@@ -1,6 +1,6 @@
 # YBIGTA Spark & Flink 과제
 
-Flink(스트리밍)와 Spark(배치)로 같은 데이터를 처리할 때 어떤 차이가 있는지 확인하는 과제.
+Flink(스트리밍)와 Spark(배치)로 같은 데이터를 처리할 때 어떤 차이가 있는지 직접 확인해보는 과제입니다.
 
 ```
 Flink  Kafka → 이벤트 도착 즉시 처리 → 결과
@@ -9,7 +9,7 @@ Spark  CSV 전체 로드 → 한번에 집계 → 결과
 
 ---
 
-## 시작
+## 시작하기
 
 ```bash
 # 1. 설정 파일 수정 (student/README.md 참고)
@@ -38,16 +38,16 @@ cat results/result.json
 
 ## 작업 범위
 
-`student/` 안에서만 수정.
+`student/` 안에서만 수정하시면 됩니다.
 
 | 파일 | 내용 |
 |------|------|
 | `student/conf/flink-conf.yaml` | Flink 체크포인팅 / 병렬성 |
 | `student/conf/spark-defaults.conf` | Spark shuffle 파티션 수 |
 
-건드리면 안 되는 것: `docker-compose.yml`, `jobs/`, `scenarios/`, `scripts/`
+아래 파일들은 수정하지 마세요: `docker-compose.yml`, `jobs/`, `scenarios/`, `scripts/`
 
-설정 방법은 [`student/README.md`](student/README.md) 참고.
+설정 방법은 [`student/README.md`](student/README.md)를 참고하세요.
 
 ---
 
@@ -61,7 +61,7 @@ cat results/result.json
 | 04 | `spark-shuffle` | 파티션 수에 따른 속도 차이 |
 | 05 | `pipeline` | Kafka → Flink → Spark 전체 흐름 |
 
-5개 모두 통과해야 한다.
+5개 시나리오를 모두 통과하면 됩니다.
 
 ---
 
@@ -73,7 +73,7 @@ git commit -m "submit: <이름>"
 git push
 ```
 
-`submissions/<이름>/` 안에 `result.json`과 `conf/`만 포함되어야 한다.
+`submissions/<이름>/` 안에 `result.json`과 `conf/`만 포함되어야 합니다.
 
 ---
 
