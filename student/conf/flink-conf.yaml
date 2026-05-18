@@ -3,9 +3,7 @@
 # YBIGTA Spark & Flink Homework
 # =============================================================================
 
-# -----------------------------------------------------------------------------
-# FIXED SETTINGS - DO NOT MODIFY
-# -----------------------------------------------------------------------------
+# 아래 값은 건드리지 마세요
 jobmanager.rpc.address: flink-jm
 jobmanager.rpc.port: 6123
 jobmanager.memory.process.size: 1600m
@@ -14,15 +12,15 @@ rest.port: 8081
 rest.address: 0.0.0.0
 
 # -----------------------------------------------------------------------------
-# TODO: Checkpointing — 이 설정이 없으면 Flink 잡이 시작되지 않습니다.
+# TODO: Checkpointing
 #
-# Flink는 스트리밍 처리 중 주기적으로 상태(State) 스냅샷을 저장합니다.
-# 장애가 나도 마지막 체크포인트부터 정확히 재처리할 수 있습니다.
+# Flink는 처리 중 주기적으로 상태를 저장해둡니다. 이 설정이 없으면 잡이 안 뜹니다.
+# 아래 네 줄을 채워주세요.
 #
-# execution.checkpointing.interval  : 스냅샷을 몇 ms마다 찍을지
+# execution.checkpointing.interval  : 몇 ms마다 저장할지
 # execution.checkpointing.mode      : EXACTLY_ONCE or AT_LEAST_ONCE
-# state.checkpoints.dir             : 스냅샷 저장 경로 (컨테이너 내부 경로)
-# state.backend                     : 상태 저장 방식 (hashmap / rocksdb)
+# state.checkpoints.dir             : 저장 경로 (컨테이너 내부 경로)
+# state.backend                     : hashmap or rocksdb
 # -----------------------------------------------------------------------------
 # execution.checkpointing.interval:
 # execution.checkpointing.mode:
@@ -30,14 +28,14 @@ rest.address: 0.0.0.0
 # state.backend:
 
 # -----------------------------------------------------------------------------
-# TODO: 병렬성 — 시나리오 03의 latency_ratio에 직접 영향을 줍니다.
+# TODO: 병렬성
 #
-# TaskManager가 3대 있고, 각 TM은 numberOfTaskSlots개의 슬롯을 가집니다.
-# parallelism.default는 Flink 잡이 몇 개의 병렬 태스크로 실행될지 결정합니다.
-# 병렬성이 높을수록 처리가 빠르지만, 가용 슬롯 수를 초과하면 잡이 시작되지 않습니다.
+# TaskManager가 3대 있습니다. 각 TM이 슬롯을 몇 개 가질지,
+# 잡이 몇 개 병렬로 돌지 결정하세요.
+# parallelism이 (TM 수 × 슬롯 수)를 넘으면 잡이 안 뜹니다.
 #
 # taskmanager.numberOfTaskSlots  : TM 1대당 슬롯 수
-# parallelism.default            : 잡의 기본 병렬성 (≤ TM수 × 슬롯수)
+# parallelism.default            : 잡 기본 병렬성
 # -----------------------------------------------------------------------------
 # taskmanager.numberOfTaskSlots:
 # parallelism.default:
