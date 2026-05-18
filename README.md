@@ -1,6 +1,6 @@
 # YBIGTA Spark & Flink 과제
 
-Flink(스트리밍)와 Spark(배치)로 같은 데이터를 처리하면 결과가 얼마나 다른지 직접 확인하는 과제입니다.
+Flink(스트리밍)와 Spark(배치)로 같은 데이터를 처리할 때 어떤 차이가 있는지 확인하는 과제.
 
 ```
 Flink  Kafka → 이벤트 도착 즉시 처리 → 결과
@@ -9,7 +9,7 @@ Spark  CSV 전체 로드 → 한번에 집계 → 결과
 
 ---
 
-## 시작하기
+## 시작
 
 ```bash
 # 1. 설정 파일 수정 (student/README.md 참고)
@@ -36,9 +36,9 @@ cat results/result.json
 
 ---
 
-## 할 일
+## 작업 범위
 
-`student/` 안에서만 작업하면 됩니다.
+`student/` 안에서만 수정.
 
 | 파일 | 내용 |
 |------|------|
@@ -47,7 +47,7 @@ cat results/result.json
 
 건드리면 안 되는 것: `docker-compose.yml`, `jobs/`, `scenarios/`, `scripts/`
 
-자세한 건 [`student/README.md`](student/README.md) 참고.
+설정 방법은 [`student/README.md`](student/README.md) 참고.
 
 ---
 
@@ -61,7 +61,7 @@ cat results/result.json
 | 04 | `spark-shuffle` | 파티션 수에 따른 속도 차이 |
 | 05 | `pipeline` | Kafka → Flink → Spark 전체 흐름 |
 
-5개 모두 통과하면 됩니다.
+5개 모두 통과해야 한다.
 
 ---
 
@@ -73,11 +73,11 @@ git commit -m "submit: <이름>"
 git push
 ```
 
-`submissions/<이름>/` 안에 `result.json`과 `conf/`만 올라가면 됩니다.
+`submissions/<이름>/` 안에 `result.json`과 `conf/`만 포함되어야 한다.
 
 ---
 
-## 기타
+## 클러스터 관리
 
 ```bash
 ./scripts/cluster.sh build    # 이미지 빌드
