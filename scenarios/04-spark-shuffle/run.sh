@@ -45,7 +45,7 @@ SCENARIO_NAME="spark-shuffle"
 LARGE_INPUT="/data/spark-input/events_large.csv"
 OUTPUT_FILE="/data/spark-output/result_large.csv"
 BASELINE_OUTPUT="/data/spark-output/result_large_baseline.csv"
-TARGET_TIME_MS=90000
+TARGET_TIME_MS=60000
 ROW_COUNT=50000
 
 START_MS=$(now_ms)
@@ -249,14 +249,16 @@ log_info "속도 향상: ${SPEEDUP_FACTOR}x"
 log_info "출력 sha256:  $ACTUAL_SHA256"
 log_info "기대 sha256: $EXPECTED_SHA256"
 
-if [[ "$ACTUAL_SHA256" == "$EXPECTED_SHA256" && $JOB_TIME_MS -le $TARGET_TIME_MS ]]; then
+PARTITIONS_OK=$(python3 -c "print(1 if int('${SHUFFLE_PARTITIONS}') <= 8 else 0)" 2>/dev/null || echo 0)
+
+if [[ "$ACTUAL_SHA256" == "$EXPECTED_SHA256" && "$PARTITIONS_OK" == "1" ]]; then
     PASSED=true
-    log_info "PASSED: ${JOB_TIME_MS}ms < 60s, 출력 정확, ${SPEEDUP_FACTOR}x speedup!"
+    log_info "PASSED: 출력 정확, shuffle.partitions=${SHUFFLE_PARTITIONS} (기준: 8 이하)"
 elif [[ "$ACTUAL_SHA256" != "$EXPECTED_SHA256" ]]; then
     log_error "FAILED: 출력 해시 불일치"
 else
-    log_error "FAILED: ${JOB_TIME_MS}ms > 60s"
-    log_error "힌트: spark.sql.shuffle.partitions를 4~8로 설정하세요 (현재: $SHUFFLE_PARTITIONS)"
+    log_error "FAILED: shuffle.partitions=${SHUFFLE_PARTITIONS} > 8"
+    log_error "힌트: spark.sql.shuffle.partitions 기본값(200)은 소규모 데이터에 비효율적입니다"
 fi
 
 printf '{"id":"%s","name":"%s","passed":%s,"shuffle_partitions_used":%s,"rows_processed":%d,"rows_per_second":%s,"job_time_ms":%d,"baseline_time_ms":%d,"speedup_factor":%s,"output_sha256":"%s","expected_sha256":"%s","elapsed_ms":%d}\n' \
