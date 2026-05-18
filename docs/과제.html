@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Spark & Flink 과제</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #37352f;
+    background: #fff;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 80px 60px 120px;
+  }
+
+  /* ── 제목 ── */
+  h1 {
+    font-size: 40px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.2;
+    margin-bottom: 28px;
+  }
+
+  /* ── 노션 callout 박스 ── */
+  .callout {
+    background: #f7f6f3;
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 15px;
+    color: #37352f;
+    line-height: 1.7;
+  }
+  .callout a { color: #37352f; text-decoration: underline; }
+  .callout .row { display: flex; gap: 8px; }
+  .callout .at { color: #888; flex-shrink: 0; }
+
+  /* ── 구분선 ── */
+  hr { border: none; border-top: 1px solid #e9e9e7; margin: 40px 0; }
+
+  /* ── 섹션 제목 ── */
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 40px 0 12px;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 24px 0 8px;
+  }
+
+  p { color: #37352f; margin-bottom: 10px; font-size: 16px; }
+
+  /* ── 코드 블록 ── */
+  pre {
+    background: #f7f6f3;
+    border-radius: 4px;
+    padding: 16px 20px;
+    font-family: 'SFMono-Regular', 'Consolas', 'Menlo', monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #37352f;
+    margin: 12px 0;
+    overflow-x: auto;
+  }
+  pre .c { color: #9b9a97; }
+
+  code {
+    font-family: 'SFMono-Regular', 'Consolas', monospace;
+    font-size: 14px;
+    background: #f7f6f3;
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: #eb5757;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  /* ── 테이블 ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 15px;
+  }
+  th {
+    background: #f7f6f3;
+    font-weight: 600;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid #e9e9e7;
+    color: #37352f;
+    font-size: 14px;
+  }
+  td {
+    padding: 9px 14px;
+    border: 1px solid #e9e9e7;
+    color: #37352f;
+    vertical-align: top;
+    font-size: 15px;
+  }
+
+  /* ── 리스트 ── */
+  ul { padding-left: 24px; margin: 10px 0; }
+  ul li { margin-bottom: 4px; color: #37352f; font-size: 16px; }
+
+  /* ── 디렉터리 트리 ── */
+  .tree {
+    background: #f7f6f3;
+    border-radius: 4px;
+    padding: 16px 20px;
+    font-family: 'SFMono-Regular', 'Consolas', monospace;
+    font-size: 13.5px;
+    line-height: 1.9;
+    color: #37352f;
+    margin: 12px 0;
+  }
+  .tree .hl { font-weight: 700; }
+  .tree .dim { color: #9b9a97; }
+
+  /* ── 시나리오 번호 ── */
+  .num {
+    display: inline-block;
+    font-family: 'SFMono-Regular', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: #9b9a97;
+    margin-right: 4px;
+  }
+
+  @media print {
+    body { padding: 60px 60px 80px; }
+    h2 { margin-top: 32px; }
+    pre { break-inside: avoid; }
+    table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Spark &amp; Flink 과제</h1>
+
+<div class="callout">
+  GitHub → <a href="https://github.com/qkrwnsqja8996/YBIGTA_SPFL_hw">github.com/qkrwnsqja8996/YBIGTA_SPFL_hw</a><br><br>
+  Flink(스트리밍)와 Spark(배치)로 같은 데이터를 처리할 때 어떤 차이가 있는지 직접 확인하는 과제입니다.<br>
+  설정 파일 2개를 채우는 게 전부입니다. 값을 찾는 게 아니라, 왜 그 값인지를 이해하는 게 목표입니다.
+</div>
+
+<hr>
+
+<h2>빠른 시작</h2>
+
+<pre><span class="c"># 이미지 빌드 (최초 1회)</span>
+./scripts/cluster.sh build
+
+<span class="c"># 클러스터 시작</span>
+./scripts/cluster.sh init
+
+<span class="c"># 전체 시나리오 실행</span>
+./run_all.sh
+
+<span class="c"># 결과 확인</span>
+cat results/result.json</pre>
+
+<p><strong>준비물</strong></p>
+<ul>
+  <li>Docker Desktop — Settings → Resources → Memory를 <strong>6GB 이상</strong>으로 올려주세요</li>
+  <li>Docker Compose v2</li>
+  <li>디스크 10GB 이상</li>
+</ul>
+
+<hr>
+
+<h2>해야 할 것</h2>
+
+<p><code>student/</code> 안에서만 수정하면 됩니다.</p>
+
+<table>
+  <thead><tr><th>파일</th><th>내용</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>student/conf/flink-conf.yaml</code></td>
+      <td>체크포인팅 설정(간격, 모드, 저장 경로)과 병렬성 설정 — <code># TODO</code> 블록을 채우세요</td>
+    </tr>
+    <tr>
+      <td><code>student/conf/spark-defaults.conf</code></td>
+      <td>shuffle partition 수 조정 — 지금 200으로 되어 있는데, 이 상태로 실행하면 시나리오 04가 실패합니다</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>힌트는 각 파일 주석과 <code>student/README.md</code>에 있습니다. 수정 금지: <code>docker-compose.yml</code>, <code>jobs/</code>, <code>scenarios/</code>, <code>scripts/</code></p>
+
+<hr>
+
+<h2>시나리오</h2>
+
+<table>
+  <thead><tr><th>#</th><th>이름</th><th>내용</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="num">01</span></td>
+      <td><code>flink-basic</code></td>
+      <td>Flink 실시간 처리 — 설정이 맞아야 잡이 뜹니다</td>
+    </tr>
+    <tr>
+      <td><span class="num">02</span></td>
+      <td><code>spark-batch</code></td>
+      <td>Spark 배치 집계 — CSV 읽고 groupBy</td>
+    </tr>
+    <tr>
+      <td><span class="num">03</span></td>
+      <td><code>stream-vs-batch</code></td>
+      <td>같은 데이터를 두 엔진으로 처리, latency 비교</td>
+    </tr>
+    <tr>
+      <td><span class="num">04</span></td>
+      <td><code>spark-shuffle</code></td>
+      <td>파티션 수 과다 → 오버헤드 폭증. 이해하고 고치세요</td>
+    </tr>
+    <tr>
+      <td><span class="num">05</span></td>
+      <td><code>pipeline</code></td>
+      <td>Kafka → Flink → Spark 전체 파이프라인</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>5개 모두 통과하면 됩니다.</p>
+
+<hr>
+
+<h2>채점</h2>
+
+<table>
+  <thead><tr><th>항목</th><th>기준</th></tr></thead>
+  <tbody>
+    <tr><td>시나리오 통과</td><td>5개 전부 <code>passed: true</code></td></tr>
+    <tr><td>출력 정합성</td><td>각 시나리오의 output sha256 일치</td></tr>
+  </tbody>
+</table>
+
+<p>5개 전부 통과하면 PASS, 그 이상은 리더보드 순위용입니다.</p>
+
+<h3>리더보드</h3>
+<ul>
+  <li>1순위: <code>scenarios_passed</code> 많을수록</li>
+  <li>2순위: <code>penalty_ms</code> 적을수록 (통과한 시나리오 실행 시간 합)</li>
+</ul>
+
+<hr>
+
+<h2>디렉터리 구조</h2>
+
+<div class="tree">YBIGTA_SPFL_hw/
+├── docker-compose.yml     <span class="dim"># 클러스터 구성 — 수정 금지</span>
+├── run_all.sh             <span class="dim"># 전체 실행</span>
+├── scripts/               <span class="dim"># 클러스터 제어 — 수정 금지</span>
+├── scenarios/             <span class="dim"># 검증 스크립트 — 수정 금지</span>
+├── jobs/                  <span class="dim"># Flink / Spark 잡 — 수정 금지</span>
+├── <span class="hl">student/               # ★ 여기서만 작업하세요 ★</span>
+│   ├── conf/
+│   │   ├── flink-conf.yaml
+│   │   └── spark-defaults.conf
+│   └── README.md
+├── results/               <span class="dim"># result.json 생성 위치</span>
+└── submissions/           <span class="dim"># 제출 파일 위치</span></div>
+
+<hr>
+
+<h2>제출 방법</h2>
+
+<pre>./scripts/prepare_submission.sh &lt;이름&gt;
+git commit -m "submit: &lt;이름&gt;"
+git push</pre>
+
+<p><code>submissions/&lt;이름&gt;/</code> 안에 아래 파일만 있으면 됩니다.</p>
+
+<pre>submissions/
+└── &lt;이름&gt;/
+    ├── result.json
+    └── conf/
+        ├── flink-conf.yaml
+        └── spark-defaults.conf</pre>
+
+<p>PR을 올리면 GitHub Actions가 자동으로 검증합니다. <code>student/</code>, <code>results/</code> 등 다른 파일이 같이 올라오면 CI가 실패합니다. PR은 검증 통과 후 merge됩니다.</p>
+
+</body>
+</html>
