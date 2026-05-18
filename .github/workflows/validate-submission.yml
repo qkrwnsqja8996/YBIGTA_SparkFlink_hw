@@ -16,22 +16,30 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: 제출자 확인
         id: find
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          changed=$(git diff --name-only origin/main...HEAD | grep '^submissions/' || true)
+
+          changed=$(gh api \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+            --jq '.[].filename' | grep '^submissions/' || true)
+
           if [[ -z "$changed" ]]; then
             echo "submissions/ 안에 변경된 파일이 없습니다." >&2
             exit 1
           fi
+
           name=$(echo "$changed" | head -1 | cut -d'/' -f2)
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "제출자: $name"
-          outside=$(git diff --name-only origin/main...HEAD | grep -v "^submissions/${name}/" || true)
+
+          outside=$(gh api \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+            --jq '.[].filename' | grep -v "^submissions/${name}/" || true)
           if [[ -n "$outside" ]]; then
             echo "오류: submissions/${name}/ 밖의 파일이 포함되어 있습니다:" >&2
             echo "$outside" >&2
