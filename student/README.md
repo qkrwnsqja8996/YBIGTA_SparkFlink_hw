@@ -1,30 +1,29 @@
 # 수정 가능한 파일
 
-| 파일 | 역할 |
+| 파일 | 내용 |
 |------|------|
-| `conf/flink-conf.yaml` | Flink 체크포인팅 / 병렬성 설정 |
-| `conf/spark-defaults.conf` | Spark shuffle 파티션 수 조정 |
-| `docker-compose.student.yml` | 컨테이너 메모리 리소스 조정 (선택) |
+| `conf/flink-conf.yaml` | Flink 체크포인팅 / 병렬성 |
+| `conf/spark-defaults.conf` | Spark shuffle 파티션 수 |
+| `docker-compose.student.yml` | 컨테이너 메모리 리소스 (선택) |
 
-수정하면 안 되는 것: `../docker-compose.yml`, `../jobs/`, `../scenarios/`, `../scripts/`
+건드리면 안 되는 것: `../docker-compose.yml`, `../jobs/`, `../scenarios/`, `../scripts/`
 
 ---
 
 ## flink-conf.yaml
 
-파일 안의 `# TODO` 블록에 있는 설정 키들을 채우세요.
+파일 안의 `# TODO` 블록에 있는 설정 키들을 채운다.
 
-각 키가 무엇을 하는지는 주석에 설명되어 있습니다.
-값은 직접 찾아야 합니다.
+각 키가 무엇을 하는지는 주석에 설명되어 있다. 값은 직접 찾아야 한다.
 
-참고: [Flink Configuration 공식 문서](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/config/)
+참고: [Flink Configuration](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/config/)
 
 ---
 
 ## spark-defaults.conf
 
-`spark.sql.shuffle.partitions`가 기본값 **200**으로 설정되어 있습니다.
+`spark.sql.shuffle.partitions`가 **200**으로 설정되어 있다.
 
-이 상태로 실행하면 시나리오 04가 실패합니다. 왜 실패하는지 이해하고 적절한 값으로 바꾸세요.
+이 상태로 실행하면 시나리오 04가 실패한다. 왜 실패하는지 이해하고 적절한 값으로 바꾼다.
 
-참고: [Spark Configuration 공식 문서](https://spark.apache.org/docs/3.4.4/configuration.html)
+참고: [Spark Configuration](https://spark.apache.org/docs/3.4.4/configuration.html)
