@@ -1,0 +1,41 @@
+# =============================================================================
+# Flink Cluster Configuration
+# YBIGTA Spark & Flink Homework
+# =============================================================================
+
+# 아래 값은 건드리지 마세요
+jobmanager.rpc.address: flink-jm
+jobmanager.rpc.port: 6123
+jobmanager.memory.process.size: 1600m
+taskmanager.memory.process.size: 1728m
+rest.port: 8081
+rest.address: 0.0.0.0
+
+# -----------------------------------------------------------------------------
+# TODO: Checkpointing
+#
+# Flink는 처리 중 주기적으로 상태를 저장해둡니다. 이 설정이 없으면 잡이 안 뜹니다.
+# 아래 네 줄을 채워주세요.
+#
+# execution.checkpointing.interval  : 몇 ms마다 저장할지
+# execution.checkpointing.mode      : EXACTLY_ONCE or AT_LEAST_ONCE
+# state.checkpoints.dir             : 저장 경로 (컨테이너 내부 경로)
+# state.backend                     : hashmap or rocksdb
+# -----------------------------------------------------------------------------
+# execution.checkpointing.interval:
+# execution.checkpointing.mode:
+# state.checkpoints.dir:
+# state.backend:
+
+# -----------------------------------------------------------------------------
+# TODO: 병렬성
+#
+# TaskManager가 3대 있습니다. 각 TM이 슬롯을 몇 개 가질지,
+# 잡이 몇 개 병렬로 돌지 결정하세요.
+# parallelism이 (TM 수 × 슬롯 수)를 넘으면 잡이 안 뜹니다.
+#
+# taskmanager.numberOfTaskSlots  : TM 1대당 슬롯 수
+# parallelism.default            : 잡 기본 병렬성
+# -----------------------------------------------------------------------------
+# taskmanager.numberOfTaskSlots:
+# parallelism.default:
