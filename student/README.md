@@ -12,18 +12,15 @@
 
 ## flink-conf.yaml
 
-파일 안의 `# TODO` 블록에 있는 설정 키들을 채운다.
+`# TODO` 블록의 설정 키들을 채운다. 각 키에 대한 설명은 주석 참고.
 
-각 키가 무엇을 하는지는 주석에 설명되어 있다. 값은 직접 찾아야 한다.
-
-참고: [Flink Configuration](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/config/)
+- [Flink Configuration 공식 문서](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/config/)
+- [Checkpointing 공식 문서](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/ops/state/checkpoints/)
 
 ---
 
 ## spark-defaults.conf
 
-`spark.sql.shuffle.partitions`가 **200**으로 설정되어 있다.
+`spark.sql.shuffle.partitions`가 **200**으로 설정되어 있다. 이 상태로 실행하면 시나리오 04가 실패한다. 왜 실패하는지 이해하고 적절한 값으로 변경하여 통과시킨다.
 
-이 상태로 실행하면 시나리오 04가 실패한다. 왜 실패하는지 이해하고 적절한 값으로 바꾼다.
-
-참고: [Spark Configuration](https://spark.apache.org/docs/3.4.4/configuration.html)
+- [Spark Configuration 공식 문서](https://spark.apache.org/docs/3.4.4/configuration.html)
