@@ -1,0 +1,125 @@
+version: "3.8"
+
+# =============================================================================
+# Student Resource Override Configuration
+# YBIGTA Spark & Flink HA Homework
+# =============================================================================
+#
+# This file overrides Docker resource limits for each service.
+# Modify the memory limits here if your machine has more or less RAM.
+#
+# IMPORTANT:
+#   - spark.executor.memory in spark-defaults.conf must be LESS than
+#     the spark-worker memory limit set here.
+#   - Total memory across all containers should not exceed your system RAM.
+#
+# Default total: ~7GB
+#   zookeeper: 256m
+#   kafka: 512m
+#   flink-jm: 1.6g (fixed by flink)
+#   flink-tm1/2/3: 1.7g each (fixed by flink)
+#   spark-master: 512m
+#   spark-worker1/2/3: 1.5g each
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Zookeeper
+  # ---------------------------------------------------------------------------
+  zookeeper:
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+        reservations:
+          memory: 128m
+
+  # ---------------------------------------------------------------------------
+  # Kafka
+  # ---------------------------------------------------------------------------
+  kafka:
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 256m
+
+  # ---------------------------------------------------------------------------
+  # Flink JobManager
+  # ---------------------------------------------------------------------------
+  flink-jm:
+    deploy:
+      resources:
+        limits:
+          memory: 3g
+        reservations:
+          memory: 1g
+
+  # ---------------------------------------------------------------------------
+  # Flink TaskManagers
+  # Increase memory if Flink jobs fail with OOM errors.
+  # ---------------------------------------------------------------------------
+  flink-tm1:
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 1g
+
+  flink-tm2:
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 1g
+
+  flink-tm3:
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 1g
+
+  # ---------------------------------------------------------------------------
+  # Spark Master
+  # ---------------------------------------------------------------------------
+  spark-master:
+    deploy:
+      resources:
+        limits:
+          memory: 1500m
+        reservations:
+          memory: 512m
+
+  # ---------------------------------------------------------------------------
+  # Spark Workers
+  # spark.executor.memory in spark-defaults.conf must be LESS than this.
+  # If you increase executor memory, increase this limit too.
+  # ---------------------------------------------------------------------------
+  spark-worker1:
+    deploy:
+      resources:
+        limits:
+          memory: 1500m
+        reservations:
+          memory: 512m
+
+  spark-worker2:
+    deploy:
+      resources:
+        limits:
+          memory: 1500m
+        reservations:
+          memory: 512m
+
+  spark-worker3:
+    deploy:
+      resources:
+        limits:
+          memory: 1500m
+        reservations:
+          memory: 512m

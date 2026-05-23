@@ -1,0 +1,24 @@
+FROM apache/spark:3.4.4
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3-pip \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Bitnami 경로 호환 심링크
+# docker-compose.yml과 시나리오 스크립트가 /opt/bitnami/spark/... 를 사용하므로
+RUN mkdir -p /opt/bitnami && ln -s /opt/spark /opt/bitnami/spark
+
+# SPARK_MODE 환경변수로 master/worker 역할 전환 (Bitnami 방식 재구현)
+COPY docker/spark-entrypoint.sh /spark-entrypoint.sh
+RUN chmod +x /spark-entrypoint.sh
+
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$SPARK_HOME/bin:$PATH
+ENV PYSPARK_PYTHON=python3
+ENV PYSPARK_DRIVER_PYTHON=python3
+
+ENTRYPOINT ["/spark-entrypoint.sh"]

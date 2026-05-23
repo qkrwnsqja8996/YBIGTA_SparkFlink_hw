@@ -1,0 +1,110 @@
+name: Validate Submission
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "submissions/**"
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 제출자 확인
+        id: find
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          changed=$(gh api \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+            --jq '.[].filename' | grep '^submissions/' || true)
+
+          if [[ -z "$changed" ]]; then
+            echo "submissions/ 안에 변경된 파일이 없습니다." >&2
+            exit 1
+          fi
+
+          name=$(echo "$changed" | head -1 | cut -d'/' -f2)
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "제출자: $name"
+
+          outside=$(gh api \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+            --jq '.[].filename' | grep -v "^submissions/${name}/" || true)
+          if [[ -n "$outside" ]]; then
+            echo "오류: submissions/${name}/ 밖의 파일이 포함되어 있습니다:" >&2
+            echo "$outside" >&2
+            exit 1
+          fi
+
+      - name: 필수 파일 확인
+        run: |
+          name="${{ steps.find.outputs.name }}"
+          base="submissions/${name}"
+          missing=()
+          [[ ! -f "${base}/result.json" ]] && missing+=("result.json")
+          [[ ! -f "${base}/conf/flink-conf.yaml" ]] && missing+=("conf/flink-conf.yaml")
+          [[ ! -f "${base}/conf/spark-defaults.conf" ]] && missing+=("conf/spark-defaults.conf")
+          [[ ! -f "${base}/REPORT.md" ]] && missing+=("REPORT.md")
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            printf '없는 파일: %s\n' "${missing[@]}" >&2
+            exit 1
+          fi
+
+      - name: result.json 검증
+        run: |
+          python3 scripts/validate_submission_result.py \
+            "submissions/${{ steps.find.outputs.name }}/result.json"
+
+      - name: 5/5 통과 확인
+        run: |
+          name="${{ steps.find.outputs.name }}"
+          passed=$(python3 -c "
+          import json
+          d = json.load(open('submissions/${name}/result.json'))
+          print(d['scenarios_passed'])
+          ")
+          echo "통과: ${passed}/5"
+          if [[ "$passed" != "5" ]]; then
+            echo "오류: 5개 모두 통과해야 합니다 (현재 ${passed}/5)" >&2
+            exit 1
+          fi
+
+      - name: PR 코멘트
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const name = '${{ steps.find.outputs.name }}';
+            const ok = '${{ job.status }}' === 'success';
+            let body;
+            if (ok && name) {
+              const fs = require('fs');
+              const r = JSON.parse(fs.readFileSync('submissions/' + name + '/result.json', 'utf8'));
+              const rows = r.scenarios.map(function(s) {
+                return '| ' + s.id + ' | ' + s.name + ' | ' + (s.passed ? 'PASS' : 'FAIL') + ' | ' + s.elapsed_ms + ' ms |';
+              }).join('\n');
+              body = '## PASS - ' + name + '\n\n'
+                + '| # | 시나리오 | 결과 | 시간 |\n'
+                + '|---|----------|------|------|\n'
+                + rows + '\n\n'
+                + '통과: ' + r.scenarios_passed + '/' + r.scenarios_total
+                + ' | penalty_ms: ' + r.penalty_ms;
+            } else {
+              body = '## FAIL - ' + (name || '(확인 불가)') + '\n\nActions 로그를 확인하고 다시 push해주세요.';
+            }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
