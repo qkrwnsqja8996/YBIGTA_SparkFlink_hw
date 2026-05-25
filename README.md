@@ -74,11 +74,17 @@ cat results/result.json
 
 ## 제출
 
+1. GitHub에서 이 저장소를 **Fork** 합니다.
+2. Fork한 저장소를 클론해서 과제를 진행합니다.
+3. 완료 후 아래 명령어로 제출 파일을 준비합니다.
+
 ```bash
 ./scripts/prepare_submission.sh <이름>
 git commit -m "submit: <이름>"
 git push
 ```
+
+4. Fork한 저장소에서 원본 저장소로 **Pull Request**를 올립니다.
 
 `submissions/<이름>/` 안에 아래 파일들만 포함되어야 합니다: `result.json`, `conf/`, `REPORT.md`
 

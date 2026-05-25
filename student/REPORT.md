@@ -42,7 +42,7 @@ result.json (`results/scenario_02.json`)에서 시나리오 02의 값:
 
 ---
 
-## 03 · Stream vs Batch (★ 핵심)
+## 03 · Stream vs Batch
 
 시나리오 03 실행 후 result.json에서:
 
@@ -70,18 +70,18 @@ result.json (`results/scenario_02.json`)에서 시나리오 02의 값:
 
 ---
 
-## 04 · Spark Shuffle + DAG (★ 핵심)
+## 04 · Spark Shuffle + DAG
 
 시나리오 04는 자동으로 두 번 spark-submit을 실행합니다:
 - **baseline**: `shuffle.partitions = 200`으로 측정
-- **본 실행**: 학생이 conf에 채운 값으로 측정
+- **본 실행**: conf에 채운 값으로 측정
 
 `results/scenario_04.json`에서:
 
 | 항목 | 값 |
 |------|-----|
 | `shuffle_partitions_used` | |
-| `job_time_ms` (학생 값) | |
+| `job_time_ms` | |
 | `baseline_time_ms` (200 기준) | |
 | `speedup_factor` | |
 
@@ -99,20 +99,9 @@ result.json (`results/scenario_02.json`)에서 시나리오 02의 값:
 
 → 
 
-**DAG 관찰**: Spark UI에서 잡 클릭 → **DAG Visualization** 보기.
-
-- stage가 몇 개로 쪼개졌나요?
-- 왜 groupBy가 stage 경계가 되나요? (힌트: 셔플)
-
-→ 
-
-shuffle.partitions=200이 이 클러스터에서 비효율적인 이유를 한 줄로:
-
-→ 
-
 ---
 
-## 05 · Pipeline + Fault Tolerance 철학 (★ 통찰)
+## 05 · Pipeline + Fault Tolerance
 
 시나리오 05는 Kafka → Flink → Spark 전체 파이프라인이 end-to-end로 동작하는지 확인합니다. `results/scenario_05.json`:
 
