@@ -12,11 +12,15 @@ Spark  CSV 전체 로드 → 한번에 집계 → 결과
 ## 시작하기
 
 ```bash
-# 1. 설정 파일 수정 (student/README.md 참고)
-vim student/conf/flink-conf.yaml
-vim student/conf/spark-defaults.conf
+# 0. GitHub에서 이 저장소를 Fork한 뒤, 본인 fork를 클론합니다
+git clone https://github.com/<본인 GitHub ID>/YBIGTA_SparkFlink_hw
+cd YBIGTA_SparkFlink_hw
 
-# 2. 이미지 빌드 (최초 1회)
+# 1. 설정 파일 수정 (student/README.md 참고)
+# student/conf/flink-conf.yaml
+# student/conf/spark-defaults.conf
+
+# 2. 이미지 다운로드 (최초 1회)
 ./scripts/cluster.sh build
 
 # 3. 클러스터 시작
