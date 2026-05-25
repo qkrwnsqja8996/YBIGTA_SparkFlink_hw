@@ -1,4 +1,4 @@
-# YBIGTA Spark & Flink 과제
+# Spark & Flink 과제
 
 Flink(스트리밍)와 Spark(배치)로 같은 데이터를 처리할 때 어떤 차이가 있는지 직접 확인해보는 과제입니다.
 
